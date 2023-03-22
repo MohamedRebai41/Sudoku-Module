@@ -1,18 +1,15 @@
 
-mod sudoku_grid;
-
-
-
-
-
+mod sudoku_puzzle;
+use sudoku_puzzle::SudokuPuzzle;
 
 fn main() {
-    
-    print!("Hello, world! \n");
-    let mut sudo_grid=  sudoku_grid::SudokuGrid{
-        grid: vec![vec![0;9];9]
-    };
-    sudo_grid.generate_complete_grid();
-    sudo_grid.show_sudoku();
-    
+    let mut puzzle = SudokuPuzzle::new(30);
+    puzzle.show_puzzle();
+    puzzle.generate_puzzle();
+    puzzle.show_puzzle();
+    puzzle.generate_puzzle();
+    puzzle.show_puzzle();
+
 }
+
+ 
