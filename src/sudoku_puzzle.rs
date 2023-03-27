@@ -1,8 +1,8 @@
-use rand::Rng;
+use rand::{Rng, seq::SliceRandom};
 use std::collections::HashMap;
 
 mod sudoku_grid_module;
-use self::sudoku_grid_module::{possible_values, generate_complete_grid, show_sudoku, check_row, check_column, check_square};
+use self::sudoku_grid_module::{possible_values,  show_sudoku, check_added};
 
 
 
@@ -26,9 +26,10 @@ impl SudokuPuzzle
     
     pub fn new(difficulty:usize) -> Self
     {
-        let mut grid=vec![vec![0;9];9];
-        generate_complete_grid(&mut grid);
-        let solution = grid.clone();
+        let  grid=vec![vec![0;9];9];
+        let mut solution = grid.clone();
+        SudokuPuzzle::generate_complete_grid(&mut solution);
+        
         
         let empty_cells = HashMap::new();
         SudokuPuzzle
@@ -102,7 +103,7 @@ impl SudokuPuzzle
         em_cells=self.empty_cells.keys().cloned().collect();
         for pv in possible_values(&grid,row,col)
         {
-            if pv!=rm_value && check_row(&grid, pv, row) && check_column(&grid, pv, col) && check_square(&grid, pv, row, col)
+            if pv!=rm_value && check_added(&grid, pv, row, col)
             {
                 
                 grid[row][col]=pv;
@@ -117,6 +118,40 @@ impl SudokuPuzzle
     }
 
 
+
+
+        pub fn generate_complete_grid(grid: &mut Vec<Vec<u8>>) {
+        SudokuPuzzle::gcg(grid,0,0);
+    }
+
+
+
+     fn gcg(grid: &mut Vec<Vec<u8>>, row:usize, col:usize) -> bool {
+            if row==9 {
+                return true;
+            }
+        let next_row= if col==8 {row+1} else {row};
+        let next_col= if col==8 {0} else {col+1};
+
+        let mut numbers: Vec<u8> = (1..=9).collect();
+        let mut rng = rand::thread_rng();
+        numbers.shuffle(&mut rng);
+
+            for i in 0..9 {
+                
+                if check_added(grid,numbers[i],row,col) {
+                    grid[row][col]=numbers[i];
+                    if SudokuPuzzle::gcg(grid,next_row, next_col)
+                    {
+                        return true;
+                    } 
+                }
+            }
+            grid[row][col]=0;
+            return false;
+    
+            
+    }
     pub fn show_puzzle(&self) {
         show_sudoku(&self.grid);
     }
